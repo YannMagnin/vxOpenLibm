@@ -6,7 +6,7 @@
 
 function help() {
   cat << EOF
-Uninstallation script for vxOpenLibm project (fork of OpenLibm)
+Update script the for vxOpenLibm script (fork of OpenLibm)
 
 Usage: $0 [options...]
 
@@ -47,17 +47,18 @@ _src=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 cd "$_src" || exit 1
 source ./_utils.sh
 
-if ! test -f '../openlibm/_build-vhex/install_manifest.txt'
+if ! test -f '../openlibm/_build-vhex/sysroot.txt'
 then
   echo 'vxOpenLibm not installed, nothing to do'
   exit 0
 fi
+prefix=$(cat '../openlibm/_build-vhex/sysroot.txt')
 
 if [[ "$skip_input" != 'true' ]]
 then
-  echo 'This script will remove the vxOpenLibm from the builded sysroot'
-  read -p 'Perform operation [yN] ? ' -r valid
-  if [[ "$valid" != 'y' ]]
+  echo "This script will update the vxOpenLibm for the sysroot '$prefix'"
+  read -p 'Perform operation [Yn] ? ' -r valid
+  if [[ "$valid" == 'n' ]]
   then
     echo 'Operation aborded' >&2
     exit 1
@@ -65,13 +66,18 @@ then
 fi
 
 #---
-# Manual uninstall
+# Manual update
 #---
 
-echo "$TAG removing installed files..."
-while IFS='' read -r line || [[ -n "$line" ]]
-  do
-    ! test -f "$line" && continue
-    [[ "$verbose" == 'true' ]] && echo "rm $line"
-    rm "$line"
-  done < '../openlibm/_build-vhex/install_manifest.txt'
+[[ "$verbose" == 'true' ]] && export VERBOSE=1
+
+if test -d '../.git'
+then
+  echo "$TAG try to bump the repository..."
+  callcmd git pull
+else
+  echo "$TAG WARNING: not a git repository"
+fi
+
+echo "$TAG update operation will reclone and rebuild the project..."
+./install.sh --prefix-sysroot="$prefix" --yes --overwrite

@@ -15,6 +15,7 @@ Options:
   -y, --yes             do not display validation step
   -v, --verbose         display more information during operations
       --prefix-sysroot  sysroot (install) prefix path
+      --overwrite       remove the cloned OpenLibm repo if already exists
 
 Notes:
     This project is mainly automatically installed as a dependency of the
@@ -29,6 +30,7 @@ EOF
 
 verbose=false
 skip_input=false
+overwrite=false
 prefix=''
 for arg; do
   case "$arg" in
@@ -36,6 +38,7 @@ for arg; do
     -y | --yes)                 skip_input=true;;
     -v | --verbose)             verbose=true;;
          --prefix-sysroot=*)    prefix=${arg#*=};;
+         --overwrite)           overwrite=true;;
     *)
       echo "error: unreconized argument '$arg', giving up." >&2
       exit 1
@@ -66,23 +69,26 @@ _src=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 cd "$_src" || exit 1
 source ./_utils.sh
 
-if [[ -d '../openlibm' ]]
+if [[ -d '../openlibm' &&  "$overwrite" != 'true' ]]
 then
-  echo 'OpenLibm already exists, abord' >&2
-  exit 1
+  echo 'vxOpenLibm already installed, nothing to do'
+  exit 0
 fi
 
 if [[ "$skip_input" != 'true' ]]
 then
   echo 'This script will compile and install the vxOpenLibm project'
-  echo "  - prefix  = $prefix"
-  echo "  - verbose = $verbose"
+  echo "  - prefix    = $prefix"
+  echo "  - verbose   = $verbose"
+  echo "  - overwrite = $overwrite"
   read -p 'Perform operations [Yn] ? ' -r valid
   if [[ "$valid" == 'n' ]]; then
     echo 'Operation aborted' >&2
     exit 1
   fi
 fi
+
+[[ -d '../openlibm' ]] && rm -rf ../openlibm
 
 [[ "$verbose" == 'true' ]] && export VERBOSE=1
 
@@ -110,3 +116,4 @@ callcmd cmake --build ../openlibm/_build-vhex/
 
 echo "$TAG install..."
 callcmd cmake --install ../openlibm/_build-vhex/
+echo "$prefix" > ../openlibm/_build-vhex/sysroot.txt
