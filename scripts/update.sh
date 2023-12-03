@@ -47,12 +47,12 @@ _src=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 cd "$_src" || exit 1
 source ./_utils.sh
 
-if ! test -f '../openlibm/_build-vhex/sysroot.txt'
+if ! test -f '../_openlibm/_build-vhex/sysroot.txt'
 then
   echo 'vxOpenLibm not installed, nothing to do'
   exit 0
 fi
-prefix=$(cat '../openlibm/_build-vhex/sysroot.txt')
+prefix=$(cat '../_openlibm/_build-vhex/sysroot.txt')
 
 if [[ "$skip_input" != 'true' ]]
 then

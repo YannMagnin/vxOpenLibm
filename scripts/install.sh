@@ -69,7 +69,7 @@ _src=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 cd "$_src" || exit 1
 source ./_utils.sh
 
-if [[ -d '../openlibm' &&  "$overwrite" != 'true' ]]
+if [[ -d '../_openlibm' &&  "$overwrite" != 'true' ]]
 then
   echo 'vxOpenLibm already installed, nothing to do'
   exit 0
@@ -88,7 +88,7 @@ then
   fi
 fi
 
-[[ -d '../openlibm' ]] && rm -rf ../openlibm
+[[ -d '../_openlibm' ]] && rm -rf ../_openlibm
 
 [[ "$verbose" == 'true' ]] && export VERBOSE=1
 
@@ -98,22 +98,22 @@ fi
 
 echo "$TAG clone openlibm..."
 callcmd \
-  git clone https://github.com/JuliaMath/openlibm.git --depth 1 ../openlibm
+  git clone https://github.com/JuliaMath/openlibm.git --depth 1 ../_openlibm
 
 echo "$TAG patch openlibm sources..."
-cp -r ../patches/* ../openlibm
+cp -r ../patches/* ../_openlibm
 
 echo "$TAG configure..."
 callcmd \
   cmake \
   -DCMAKE_INSTALL_PREFIX="$prefix" \
   -DCMAKE_TOOLCHAIN_FILE=../patches/toolchain.cmake \
-  -B ../openlibm/_build-vhex/ \
-  -S ../openlibm/
+  -B ../_openlibm/_build-vhex/ \
+  -S ../_openlibm/
 
 echo "$TAG build..."
-callcmd cmake --build ../openlibm/_build-vhex/
+callcmd cmake --build ../_openlibm/_build-vhex/
 
 echo "$TAG install..."
-callcmd cmake --install ../openlibm/_build-vhex/
-echo "$prefix" > ../openlibm/_build-vhex/sysroot.txt
+callcmd cmake --install ../_openlibm/_build-vhex/
+echo "$prefix" > ../_openlibm/_build-vhex/sysroot.txt

@@ -47,7 +47,7 @@ _src=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 cd "$_src" || exit 1
 source ./_utils.sh
 
-if ! test -f '../openlibm/_build-vhex/install_manifest.txt'
+if ! test -f '../_openlibm/_build-vhex/install_manifest.txt'
 then
   echo 'vxOpenLibm not installed, nothing to do'
   exit 0
@@ -74,4 +74,4 @@ while IFS='' read -r line || [[ -n "$line" ]]
     ! test -f "$line" && continue
     [[ "$verbose" == 'true' ]] && echo "rm $line"
     rm "$line"
-  done < '../openlibm/_build-vhex/install_manifest.txt'
+  done < '../_openlibm/_build-vhex/install_manifest.txt'
