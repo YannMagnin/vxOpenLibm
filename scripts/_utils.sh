@@ -14,9 +14,11 @@ export TOP_PID=$$
 # Public
 #---
 
+export TAG='<vxOpenLibm>'
+
 # abstract the verbose mode
 function callcmd() {
-  if [[ -v 'VHEX_VERBOSE' ]]
+  if [[ -v 'VERBOSE' ]]
     then
       echo "$@"
       if ! "$@"; then
@@ -32,15 +34,4 @@ function callcmd() {
     fi
     rm -f "$out"
   fi
-}
-
-# check env information
-function utils_get_env() {
-  if [ ! -v "$1" ]
-  then
-    echo 'error: are you sure to use the bootstrap script ?' >&2
-    echo " Missing $2 information, abord" >&2
-    kill -s TERM $TOP_PID
-  fi
-  echo "${!1/#\~/$HOME}"
 }

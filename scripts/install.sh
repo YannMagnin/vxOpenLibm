@@ -18,8 +18,7 @@ Options:
 
 Notes:
     This project is mainly automatically installed as a dependency of the
-  sh-elf-vhex (Vhex's compiler) project. So, the verbose option can also be
-  trigger using the env var VHEX_VERBOSE.
+  sh-elf-vhex (Vhex's compiler) project.
 EOF
   exit 0
 }
@@ -28,9 +27,9 @@ EOF
 # Parse arguments
 #---
 
-verbose=true
+verbose=false
 skip_input=false
-prefix='None'
+prefix=''
 for arg; do
   case "$arg" in
     -h | --help)                help;;
@@ -47,9 +46,11 @@ done
 # Preliminary check
 #---
 
-_src=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-cd "$_src" || exit 1
-source ./_utils.sh
+if test -z "$prefix"
+then
+  echo 'You need to specify the sysroot prefix, abord' >&2
+  exit 1
+fi
 
 if [[ ! $(sh-elf-vhex-gcc --version) ]]
 then
@@ -61,25 +62,21 @@ then
   exit 1
 fi
 
+_src=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+cd "$_src" || exit 1
+source ./_utils.sh
+
 if [[ -d '../openlibm' ]]
 then
   echo 'OpenLibm already exists, abord' >&2
   exit 1
 fi
 
-[[ "$verbose" == 'true' ]] && VHEX_VERBOSE='true'
-[[ "$prefix" != 'None' ]] && VHEX_PREFIX_SYSROOT="$prefix"
-export VHEX_VERBOSE
-export VHEX_PREFIX_SYSROOT
-
-SYSROOT=$(utils_get_env 'VHEX_PREFIX_SYSROOT' 'sysroot')
-VERBOSE=$(utils_get_env 'VHEX_VERBOSE' 'verbose')
-
 if [[ "$skip_input" != 'true' ]]
 then
   echo 'This script will compile and install the vxOpenLibm project'
-  echo "  - prefix  = $SYSROOT"
-  echo "  - verbose = $VERBOSE"
+  echo "  - prefix  = $prefix"
+  echo "  - verbose = $verbose"
   read -p 'Perform operations [Yn] ? ' -r valid
   if [[ "$valid" == 'n' ]]; then
     echo 'Operation aborted' >&2
@@ -87,13 +84,11 @@ then
   fi
 fi
 
+[[ "$verbose" == 'true' ]] && export VERBOSE=1
+
 #---
 # Build / install operations
 #---
-
-source ./_utils.sh
-
-TAG='<vxOpenLibm>'
 
 echo "$TAG clone openlibm..."
 callcmd \
@@ -102,13 +97,16 @@ callcmd \
 echo "$TAG patch openlibm sources..."
 cp -r ../patches/* ../openlibm
 
-echo "$TAG building..."
-callcmd cmake \
-  -DCMAKE_INSTALL_PREFIX="$SYSROOT" \
+echo "$TAG configure..."
+callcmd \
+  cmake \
+  -DCMAKE_INSTALL_PREFIX="$prefix" \
   -DCMAKE_TOOLCHAIN_FILE=../patches/toolchain.cmake \
   -B ../openlibm/_build-vhex/ \
   -S ../openlibm/
 
+echo "$TAG build..."
 callcmd cmake --build ../openlibm/_build-vhex/
 
+echo "$TAG install..."
 callcmd cmake --install ../openlibm/_build-vhex/
