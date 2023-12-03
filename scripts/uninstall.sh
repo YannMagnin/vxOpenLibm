@@ -13,7 +13,7 @@ Usage: $0 [options...]
 Options:
   -h, --help        display this help
   -y, --yes         do not display validation step
-  -v, --verbose     display more information during operations
+      --quiet       do not display information during operations
 
 Notes:
     This project is a dependency of "sh-elf-vhex" compiler, manual
@@ -26,13 +26,13 @@ EOF
 # Parse arguments
 #---
 
-verbose=false
+verbose=true
 skip_input=false
 for arg; do
   case "$arg" in
     -h | --help)    help;;
     -y | --yes)     skip_input=true;;
-    -v | --verbose) verbose=true;;
+         --quiet)   verbose=false;;
     *)
       echo "error: unreconized argument '$arg', giving up." >&2
       exit 1
