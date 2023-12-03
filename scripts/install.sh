@@ -13,7 +13,7 @@ Usage: $0 [options...]
 Options:
   -h, --help            display this help
   -y, --yes             do not display validation step
-      --verbose         display more information during operations
+  -v, --verbose         display more information during operations
       --prefix-sysroot  sysroot (install) prefix path
 
 Notes:
