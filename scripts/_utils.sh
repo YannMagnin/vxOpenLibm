@@ -16,9 +16,8 @@ export TOP_PID=$$
 
 export TAG='<vxOpenLibm>'
 
-# abstract the verbose mode
 function callcmd() {
-  if [[ -v 'VERBOSE' ]]
+  if [[ "$VERBOSE" == '1' ]]
     then
       echo "$@"
       if ! "$@"; then
