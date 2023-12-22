@@ -1,4 +1,4 @@
-# vxOpenLibM
+# vxOpenLibM - v1.0.0
 
 This is a wrapper around the `OpenLibm` with the support of the `sh3eb`
 architecture (written by [Lephenixnoir](https://silent-tower.net/projects/)),
